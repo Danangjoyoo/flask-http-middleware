@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: flask-http-middleware
-Version: 0.0.1
+Version: 0.0.3
 Summary: Flask HTTP Middleware with starlette's (FastAPI) BaseHTTPMiddleware style
 Home-page: UNKNOWN
 Author: danangjoyoo (Agus Danangjoyo)
