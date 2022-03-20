@@ -12,7 +12,7 @@ DESCRIPTION = "Flask HTTP Middleware with starlette's (FastAPI) BaseHTTPMiddlewa
 
 # Setting up
 setup(
-    name="fastapi-simple-crud",
+    name="flask-http-middleware",
     version=VERSION,
     author="danangjoyoo (Agus Danangjoyo)",
     author_email="<agus.danangjoyo.blog@gmail.com>",
