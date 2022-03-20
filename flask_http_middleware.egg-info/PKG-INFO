@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: flask-http-middleware
-Version: 0.0.5
+Version: 0.0.6
 Summary: Flask HTTP Middleware with starlette's (FastAPI) BaseHTTPMiddleware style
 Home-page: UNKNOWN
 Author: danangjoyoo (Agus Danangjoyo)
@@ -36,7 +36,7 @@ Description: # FastAPI Simple CRUD Generator
         
         class MetricsMiddleware(BaseHTTPMiddleware):
             def __init__(self):
-                super().__init__(self)
+                super().__init__()
             
             def dispatch(self, request, call_next):
                 t0 = time.time()
@@ -83,7 +83,7 @@ Description: # FastAPI Simple CRUD Generator
         
         class AccessMiddleware(BaseHTTPMiddleware):
             def __init__(self):
-                super().__init__(self)
+                super().__init__()
             
             def dispatch(self, request, call_next):
                 if request.headers.get("token") == "secret":
@@ -114,7 +114,7 @@ Description: # FastAPI Simple CRUD Generator
         
         class SecureRoutersMiddleware(BaseHTTPMiddleware):
             def __init__(self, secured_routers = []):
-                super().__init__(self)
+                super().__init__()
                 self.secured_routers = secured_routers
             
             def dispatch(self, request, call_next):
@@ -155,7 +155,7 @@ Description: # FastAPI Simple CRUD Generator
         
         class AccessMiddleware(BaseHTTPMiddleware):
             def __init__(self):
-                super().__init__(self)
+                super().__init__()
             
             def dispatch(self, request, call_next):
                 if request.headers.get("token") == "secret":

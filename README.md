@@ -28,7 +28,7 @@ app = Flask(__name__)
 
 class MetricsMiddleware(BaseHTTPMiddleware):
     def __init__(self):
-        super().__init__(self)
+        super().__init__()
     
     def dispatch(self, request, call_next):
         t0 = time.time()
@@ -75,7 +75,7 @@ app = Flask(__name__)
 
 class AccessMiddleware(BaseHTTPMiddleware):
     def __init__(self):
-        super().__init__(self)
+        super().__init__()
     
     def dispatch(self, request, call_next):
         if request.headers.get("token") == "secret":
@@ -106,7 +106,7 @@ app = Flask(__name__)
 
 class SecureRoutersMiddleware(BaseHTTPMiddleware):
     def __init__(self, secured_routers = []):
-        super().__init__(self)
+        super().__init__()
         self.secured_routers = secured_routers
     
     def dispatch(self, request, call_next):
@@ -147,7 +147,7 @@ app = Flask(__name__)
 
 class AccessMiddleware(BaseHTTPMiddleware):
     def __init__(self):
-        super().__init__(self)
+        super().__init__()
     
     def dispatch(self, request, call_next):
         if request.headers.get("token") == "secret":
