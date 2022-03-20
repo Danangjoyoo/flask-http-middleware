@@ -1,12 +1,12 @@
 Metadata-Version: 2.1
 Name: flask-http-middleware
-Version: 0.0.6
+Version: 0.0.7
 Summary: Flask HTTP Middleware with starlette's (FastAPI) BaseHTTPMiddleware style
 Home-page: UNKNOWN
 Author: danangjoyoo (Agus Danangjoyo)
 Author-email: <agus.danangjoyo.blog@gmail.com>
 License: UNKNOWN
-Description: # FastAPI Simple CRUD Generator
+Description: # Flask HTTP Middleware
         <!-- [![Downloads](https://static.pepy.tech/personalized-badge/fastapi-simple-crud?period=total&units=international_system&left_color=black&right_color=orange&left_text=Downloads)](https://pepy.tech/project/fastapi-simple-crud) -->
         
         ## Repository
