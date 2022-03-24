@@ -7,8 +7,8 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-VERSION = "0.0.7"
-DESCRIPTION = "Flask HTTP Middleware with starlette's (FastAPI) BaseHTTPMiddleware style"
+VERSION = "0.1.0"
+DESCRIPTION = "A module to create middleware with direct access to `request` and `response`"
 
 # Setting up
 setup(
@@ -20,7 +20,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     packages=find_packages(),
-    install_requires=["flask","werkzeug","asgiref"],
+    install_requires=["flask","werkzeug"],
     keywords=['flask', 'middleware', 'http', 'request', "response"],
     classifiers=[
         "Development Status :: 3 - Alpha",

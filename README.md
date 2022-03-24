@@ -10,11 +10,15 @@ pip install flask-http-middleware
 ```
 
 ## Description
-Flask HTTP Middleware with starlette's (FastAPI) BaseHTTPMiddleware style. Manage your middleware directly from `request` to `response` easily
+A module to create flask middleware with direct access to `request` and `response`.
+
+This module implement the starlette's (FastAPI) BaseHTTPMiddleware style to Flask.
 
 ## Changelogs
 - v0.0
     - First Upload
+- v0.1
+    - Allows to stacking the middleware
 
 ## How to use ?
 
@@ -41,7 +45,7 @@ app.wsgi_app = MiddlewareManager(app)
 app.wsgi_app.add_middleware(MetricsMiddleware)
 
 @app.get("/health")
-async def health():
+def health():
     return {"message":"I'm healthy"}
 
 if __name__ == "__main__":
@@ -87,7 +91,7 @@ app.wsgi_app = MiddlewareManager(app)
 app.wsgi_app.add_middleware(AccessMiddleware)
 
 @app.get("/health")
-async def health():
+def health():
     return {"message":"I'm healthy"}
 
 if __name__ == "__main__":
@@ -124,11 +128,11 @@ app.wsgi_app = MiddlewareManager(app)
 app.wsgi_app.add_middleware(SecureRoutersMiddleware, secured_routers=secured_routers)
 
 @app.get("/health")
-async def health():
+def health():
     return {"message":"I'm healthy"}
 
 @app.get("/check_secured")
-async def health():
+def health():
     return {"message":"Security bypassed"}
 
 if __name__ == "__main__":
@@ -162,8 +166,88 @@ app.wsgi_app = MiddlewareManager(app)
 app.wsgi_app.add_middleware(AccessMiddleware)
 
 @app.get("/health")
-async def health():
+def health():
     return {"message":"I'm healthy"}
+
+if __name__ == "__main__":
+    app.run()
+```
+
+### Example: Stacking Middleware
+You can also stack your middleware
+
+`middleware.py`
+```
+import time
+from flask import jsonify
+from flask_http_middleware import BaseHTTPMiddleware
+
+class AccessMiddleware(BaseHTTPMiddleware):
+    def __init__(self):
+        super().__init__()
+    
+    def dispatch(self, request, call_next):
+        if request.headers.get("token") == "secret":
+            return call_next(request)
+        else:
+            raise Exception("Authentication Failed)
+    
+    def error_handler(self, error):
+        return jsonify({"error": str(error)})
+
+
+class MetricsMiddleware(BaseHTTPMiddleware):
+    def __init__(self):
+        super().__init__()
+    
+    def dispatch(self, request, call_next):
+        t0 = time.time()
+        response = call_next(request)
+        response_time = time.time()-t0
+        response.headers.add("response_time", response_time)
+        return response
+
+
+class SecureRoutersMiddleware(BaseHTTPMiddleware):
+    def __init__(self, secured_routers = []):
+        super().__init__()
+        self.secured_routers = secured_routers
+    
+    def dispatch(self, request, call_next):
+        if request.path in self.secured_routers:
+            if request.headers.get("token") == "secret":
+                return call_next(request)
+            else:
+                return jsonify({"message":"invalid token"})
+        else:
+            return call_next(request)
+
+```
+
+your `main.py`
+```
+import time
+from flask import Flask, jsonify
+from flask_http_middleware import MiddlewareManager
+from middleware import AccessMiddleware, MetricsMiddleware, SecureRoutersMiddleware
+
+app = Flask(__name__)
+
+my_secured_routers = ["/check_secured"]
+
+app.wsgi_app = MiddlewareManager(app)
+
+app.wsgi_app.add_middleware(AccessMiddleware)
+app.wsgi_app.add_middleware(MetricsMiddleware)
+app.wsgi_app.add_middleware(SecureRoutersMiddleware, secured_routers=my_secured_routers)
+
+@app.get("/health")
+def health():
+    return {"message":"I'm healthy"}
+
+@app.get("/check_secured")
+def health():
+    return {"message":"Security bypassed"}
 
 if __name__ == "__main__":
     app.run()
