@@ -1,5 +1,5 @@
 # Flask HTTP Middleware
-<!-- [![Downloads](https://static.pepy.tech/personalized-badge/fastapi-simple-crud?period=total&units=international_system&left_color=black&right_color=orange&left_text=Downloads)](https://pepy.tech/project/fastapi-simple-crud) -->
+[![Downloads](https://static.pepy.tech/personalized-badge/flask-http-middleware?period=month&units=international_system&left_color=black&right_color=green&left_text=Downloads)](https://pepy.tech/project/flask-http-middleware)
 
 ## Repository
 - [ ] [GITHUB](https://github.com/Danangjoyoo/flask-http-middleware)
@@ -18,7 +18,7 @@ This module implement the starlette's (FastAPI) BaseHTTPMiddleware style to Flas
 - v0.0
     - First Upload
 - v0.1
-    - Allows to stacking the middleware
+    - Allow middlewares stacking
 
 ## How to use ?
 

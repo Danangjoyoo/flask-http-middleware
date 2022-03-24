@@ -1,3 +1,2 @@
-asgiref
 flask
 werkzeug
