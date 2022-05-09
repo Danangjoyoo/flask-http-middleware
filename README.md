@@ -1,5 +1,5 @@
 # Flask HTTP Middleware
-[![Downloads](https://static.pepy.tech/personalized-badge/flask-http-middleware?period=month&units=international_system&left_color=black&right_color=green&left_text=Downloads)](https://pepy.tech/project/flask-http-middleware)
+[![Downloads](https://static.pepy.tech/personalized-badge/flask-http-middleware?period=total&units=international_system&left_color=black&right_color=orange&left_text=Downloads)](https://pepy.tech/project/flask-http-middleware)
 
 ## Repository
 - [ ] [GITHUB](https://github.com/Danangjoyoo/flask-http-middleware)
