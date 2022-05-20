@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: flask-http-middleware
-Version: 0.1.2
+Version: 0.1.3
 Summary: A module to create middleware with direct access to `request` and `response`
 Home-page: UNKNOWN
 Author: danangjoyoo (Agus Danangjoyo)
@@ -165,7 +165,7 @@ Description: # Flask HTTP Middleware
                 if request.headers.get("token") == "secret":
                     return call_next(request)
                 else:
-                    raise Exception("Authentication Failed)
+                    raise Exception("Authentication Failed")
             
             def error_handler(self, error):
                 return jsonify({"error": str(error)})
@@ -198,7 +198,7 @@ Description: # Flask HTTP Middleware
                 if request.headers.get("token") == "secret":
                     return call_next(request)
                 else:
-                    raise Exception("Authentication Failed)
+                    raise Exception("Authentication Failed")
             
             def error_handler(self, error):
                 return jsonify({"error": str(error)})

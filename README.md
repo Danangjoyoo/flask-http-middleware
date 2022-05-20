@@ -157,7 +157,7 @@ class AccessMiddleware(BaseHTTPMiddleware):
         if request.headers.get("token") == "secret":
             return call_next(request)
         else:
-            raise Exception("Authentication Failed)
+            raise Exception("Authentication Failed")
     
     def error_handler(self, error):
         return jsonify({"error": str(error)})
@@ -190,7 +190,7 @@ class AccessMiddleware(BaseHTTPMiddleware):
         if request.headers.get("token") == "secret":
             return call_next(request)
         else:
-            raise Exception("Authentication Failed)
+            raise Exception("Authentication Failed")
     
     def error_handler(self, error):
         return jsonify({"error": str(error)})
