@@ -1,6 +1,6 @@
-import sys, typing as t
+import sys
+import typing as t
 from flask import Flask, g, request_started, request_finished, request
-from flask.typing import ResponseReturnValue
 from werkzeug.wrappers import Request, Response
 
 from .base import BaseHTTPMiddleware
@@ -20,7 +20,7 @@ class MiddlewareManager():
             self.middleware_stack.insert(0, middleware_class(**options))
         else:
             raise Exception("Error Middleware Class : not inherited from BaseHTTPMiddleware class")
-    
+
     def process_request_and_get_response(self, request: Request) -> Response:
         if g.middleware_stack:
             try:
@@ -32,7 +32,7 @@ class MiddlewareManager():
                 g.middleware_stack.append(mw)
         rv = self.dispatch_request(request)
         return self.app.make_response(rv)
-    
+
     def process_request_and_handle_exception(self, error) -> Response:
         rv = self.app.handle_user_exception(error)
         return self.app.make_response(rv)
@@ -70,7 +70,7 @@ class MiddlewareManager():
                 error = None
             ctx.auto_pop(error)
 
-    def preprocess_request(self, request) -> t.Optional[ResponseReturnValue]:
+    def preprocess_request(self, request):
         names = (None, *reversed(request.blueprints))
         for name in names:
             if name in self.app.url_value_preprocessors:
@@ -79,12 +79,15 @@ class MiddlewareManager():
         for name in names:
             if name in self.app.before_request_funcs:
                 for before_func in self.app.before_request_funcs[name]:
-                    rv = self.app.ensure_sync(before_func)()
+                    try:
+                        rv = self.app.ensure_sync(before_func)()
+                    except:
+                        rv = before_func()
                     if rv is not None:
                         return rv
         return None
-    
-    def dispatch_request(self, request) -> ResponseReturnValue:
+
+    def dispatch_request(self, request):
         req = request
         if req.routing_exception is not None:
             self.app.raise_routing_exception(req)
@@ -94,4 +97,7 @@ class MiddlewareManager():
             and req.method == "OPTIONS"
         ):
             return self.app.make_default_options_response()
-        return self.app.ensure_sync(self.app.view_functions[rule.endpoint])(**req.view_args)
+        try:
+            return self.app.ensure_sync(self.app.view_functions[rule.endpoint])(**req.view_args)
+        except:
+            return self.app.view_functions[rule.endpoint](**req.view_args)
