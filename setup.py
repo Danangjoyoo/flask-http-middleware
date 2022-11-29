@@ -7,7 +7,7 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-VERSION = "0.1.5"
+VERSION = "0.1.6"
 DESCRIPTION = "A module to create middleware with direct access to `request` and `response`"
 
 # Setting up
@@ -23,12 +23,13 @@ setup(
     install_requires=["flask","werkzeug"],
     keywords=['flask', 'middleware', 'http', 'request', "response"],
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.8",
         "Environment :: Web Environment",
         "Operating System :: OS Independent",
         "Typing :: Typed"
-    ]
+    ],
+    url="https://github.com/Danangjoyoo/flask-http-middleware"
 )
