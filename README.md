@@ -1,8 +1,6 @@
 # Flask HTTP Middleware
 [![Downloads](https://static.pepy.tech/personalized-badge/flask-http-middleware?period=total&units=international_system&left_color=black&right_color=orange&left_text=Downloads)](https://pepy.tech/project/flask-http-middleware)
 
-## Repository
-- [ ] [GITHUB](https://github.com/Danangjoyoo/flask-http-middleware)
 
 ## Installation
 ```
@@ -33,7 +31,7 @@ app = Flask(__name__)
 class MetricsMiddleware(BaseHTTPMiddleware):
     def __init__(self):
         super().__init__()
-    
+
     def dispatch(self, request, call_next):
         t0 = time.time()
         response = call_next(request)
@@ -80,7 +78,7 @@ app = Flask(__name__)
 class AccessMiddleware(BaseHTTPMiddleware):
     def __init__(self):
         super().__init__()
-    
+
     def dispatch(self, request, call_next):
         if request.headers.get("token") == "secret":
             return call_next(request)
@@ -112,7 +110,7 @@ class SecureRoutersMiddleware(BaseHTTPMiddleware):
     def __init__(self, secured_routers = []):
         super().__init__()
         self.secured_routers = secured_routers
-    
+
     def dispatch(self, request, call_next):
         if request.path in self.secured_routers:
             if request.headers.get("token") == "secret":
@@ -152,13 +150,13 @@ app = Flask(__name__)
 class AccessMiddleware(BaseHTTPMiddleware):
     def __init__(self):
         super().__init__()
-    
+
     def dispatch(self, request, call_next):
         if request.headers.get("token") == "secret":
             return call_next(request)
         else:
             raise Exception("Authentication Failed")
-    
+
     def error_handler(self, error):
         return jsonify({"error": str(error)})
 
@@ -185,13 +183,13 @@ from flask_http_middleware import BaseHTTPMiddleware
 class AccessMiddleware(BaseHTTPMiddleware):
     def __init__(self):
         super().__init__()
-    
+
     def dispatch(self, request, call_next):
         if request.headers.get("token") == "secret":
             return call_next(request)
         else:
             raise Exception("Authentication Failed")
-    
+
     def error_handler(self, error):
         return jsonify({"error": str(error)})
 
@@ -199,7 +197,7 @@ class AccessMiddleware(BaseHTTPMiddleware):
 class MetricsMiddleware(BaseHTTPMiddleware):
     def __init__(self):
         super().__init__()
-    
+
     def dispatch(self, request, call_next):
         t0 = time.time()
         response = call_next(request)
@@ -212,7 +210,7 @@ class SecureRoutersMiddleware(BaseHTTPMiddleware):
     def __init__(self, secured_routers = []):
         super().__init__()
         self.secured_routers = secured_routers
-    
+
     def dispatch(self, request, call_next):
         if request.path in self.secured_routers:
             if request.headers.get("token") == "secret":
