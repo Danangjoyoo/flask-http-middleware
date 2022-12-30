@@ -17,6 +17,8 @@ This module implement the starlette's (FastAPI) BaseHTTPMiddleware style to Flas
     - First Upload
 - v0.1
     - Allow middlewares stacking
+- v0.2
+    - Adjusting wsgi middleware update for `flask>=2.2.x`
 
 ## How to use ?
 

@@ -5,7 +5,6 @@ from flask import (
     request_finished, request,
     __version__ as flask_version
 )
-from flask.globals import _cv_app, _cv_request
 from werkzeug.wrappers import Request, Response
 
 from .base import BaseHTTPMiddleware
@@ -45,6 +44,7 @@ class MiddlewareManager():
     def __call__(self, environ, start_response):
         # version 2.2
         if flask_version.startswith("2.2"):
+
             ctx = self.app.request_context(environ)
             error: t.Optional[BaseException] = None
             try:
@@ -79,6 +79,7 @@ class MiddlewareManager():
                 return response(environ, start_response)
             finally:
                 if "werkzeug.debug.preserve_context" in environ:
+                    from flask.globals import _cv_app, _cv_request
                     environ["werkzeug.debug.preserve_context"](_cv_app.get())
                     environ["werkzeug.debug.preserve_context"](_cv_request.get())
                 if self.app.should_ignore_error(error):
