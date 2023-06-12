@@ -18,7 +18,9 @@ This module implement the starlette's (FastAPI) BaseHTTPMiddleware style to Flas
 - v0.1
     - Allow middlewares stacking
 - v0.2
-    - Adjusting wsgi middleware update for `flask>=2.2.x`
+    - Add support for `flask>=2.2.x`
+- v0.3
+    - Add support for `flask>=2.3.x`
 
 ## How to use ?
 
