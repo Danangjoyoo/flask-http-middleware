@@ -43,8 +43,30 @@ class MiddlewareManager():
 
     def __call__(self, environ, start_response):
         # version 2.2
-        if flask_version.startswith("2.2"):
+        if flask_version.startswith("2.3"):
+            ctx = self.app.request_context(environ)
+            error: BaseException | None = None
+            try:
+                try:
+                    ctx.push()
+                    response = self.app.full_dispatch_request()
+                except Exception as e:
+                    error = e
+                    response = self.app.handle_exception(e)
+                except:  # noqa: B001
+                    error = sys.exc_info()[1]
+                    raise
+                return response(environ, start_response)
+            finally:
+                if "werkzeug.debug.preserve_context" in environ:
+                    from flask.globals import _cv_app, _cv_request
+                    environ["werkzeug.debug.preserve_context"](_cv_app.get())
+                    environ["werkzeug.debug.preserve_context"](_cv_request.get())
+                if error is not None and self.app.should_ignore_error(error):
+                    error = None
+                ctx.pop(error)
 
+        elif flask_version.startswith("2.2"):
             ctx = self.app.request_context(environ)
             error: t.Optional[BaseException] = None
             try:
