@@ -21,6 +21,8 @@ This module implement the starlette's (FastAPI) BaseHTTPMiddleware style to Flas
     - Add support for `flask>=2.2.x`
 - v0.3
     - Add support for `flask>=2.3.x`
+- v0.4
+    - Add support for `flask>=3.x`
 
 ## How to use ?
 
