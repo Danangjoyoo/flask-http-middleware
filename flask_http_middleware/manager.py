@@ -1,13 +1,13 @@
+import importlib
 import sys
 import typing as t
-from flask import (
-    Flask, g, request_started,
-    request_finished, request,
-    __version__ as flask_version
-)
+from flask import Flask, g, request_started, request_finished, request
 from werkzeug.wrappers import Request, Response
 
 from .base import BaseHTTPMiddleware
+
+flask_version = importlib.metadata.version("flask")
+
 
 class MiddlewareManager():
     def __init__(self, app: Flask):
@@ -42,105 +42,13 @@ class MiddlewareManager():
         return self.app.make_response(rv)
 
     def __call__(self, environ, start_response):
-        # version 2.2
-        if flask_version.startswith("2.3"):
-            ctx = self.app.request_context(environ)
-            error: BaseException | None = None
-            try:
-                try:
-                    ctx.push()
-                    response = self.app.full_dispatch_request()
-                except Exception as e:
-                    error = e
-                    response = self.app.handle_exception(e)
-                except:  # noqa: B001
-                    error = sys.exc_info()[1]
-                    raise
-                return response(environ, start_response)
-            finally:
-                if "werkzeug.debug.preserve_context" in environ:
-                    from flask.globals import _cv_app, _cv_request
-                    environ["werkzeug.debug.preserve_context"](_cv_app.get())
-                    environ["werkzeug.debug.preserve_context"](_cv_request.get())
-                if error is not None and self.app.should_ignore_error(error):
-                    error = None
-                ctx.pop(error)
-
+        if flask_version.startswith("3.0"):
+            return self.__dispatch_python_2_3_x(environ, start_response)
+        elif flask_version.startswith("2.3"):
+            return self.__dispatch_python_2_3_x(environ, start_response)
         elif flask_version.startswith("2.2"):
-            ctx = self.app.request_context(environ)
-            error: t.Optional[BaseException] = None
-            try:
-                try:
-                    ctx.push()
-                    if not self.app._got_first_request:
-                        with self.app._before_request_lock:
-                            if not self.app._got_first_request:
-                                for func in self.app.before_first_request_funcs:
-                                    self.app.ensure_sync(func)()
-                                self.app._got_first_request = True
-                    try:
-                        request_started.send(self)
-                        rv = self.app.preprocess_request()
-                        if rv is None:
-                            response = self.process_request_and_get_response(request)
-                    except Exception as e:
-                        response = self.process_request_and_handle_exception(e)
-                    try:
-                        response = self.app.process_response(response)
-                        request_finished.send(self, response=response)
-                    except Exception:
-                        self.app.logger.exception(
-                            "Request finalizing failed with an error while handling an error"
-                        )
-                except Exception as e:
-                    error = e
-                    response = self.app.handle_exception(e)
-                except:
-                    error = sys.exc_info()[1]
-                    raise
-                return response(environ, start_response)
-            finally:
-                if "werkzeug.debug.preserve_context" in environ:
-                    from flask.globals import _cv_app, _cv_request
-                    environ["werkzeug.debug.preserve_context"](_cv_app.get())
-                    environ["werkzeug.debug.preserve_context"](_cv_request.get())
-                if self.app.should_ignore_error(error):
-                    error = None
-                ctx.pop(error)
-
-        # version 2.0 and 2.1
-        else:
-            ctx = self.app.request_context(environ)
-            error: t.Optional[BaseException] = None
-            try:
-                try:
-                    ctx.push()
-                    self.app.try_trigger_before_first_request_functions()
-                    try:
-                        request_started.send(self)
-                        rv = self.app.preprocess_request()
-                        if rv is None:
-                            response = self.process_request_and_get_response(request)
-                    except Exception as e:
-                        response = self.process_request_and_handle_exception(e)
-                    try:
-                        response = self.app.process_response(response)
-                        request_finished.send(self, response=response)
-                    except Exception:
-                        self.app.logger.exception(
-                            "Request finalizing failed with an error while handling an error"
-                        )
-                except Exception as e:
-                    error = e
-                    response = self.app.handle_exception(e)
-                except:
-                    error = sys.exc_info()[1]
-                    raise
-                return response(environ, start_response)
-            finally:
-                if self.app.should_ignore_error(error):
-                    error = None
-                ctx.auto_pop(error)
+            return self.__dispatch_python_2_2_x(environ, start_response)
+        return self.__dispatch_python_2_0_x(environ, start_response)
 
     def preprocess_request(self, request):
         names = (None, *reversed(request.blueprints))
@@ -173,3 +81,120 @@ class MiddlewareManager():
             return self.app.ensure_sync(self.app.view_functions[rule.endpoint])(**req.view_args)
         except:
             return self.app.view_functions[rule.endpoint](**req.view_args)
+
+    def __dispatch_python_2_0_x(self, environ, start_response):
+        ctx = self.app.request_context(environ)
+        error: t.Optional[BaseException] = None
+        try:
+            try:
+                ctx.push()
+                self.app.try_trigger_before_first_request_functions()
+                try:
+                    request_started.send(self)
+                    rv = self.app.preprocess_request()
+                    if rv is None:
+                        response = self.process_request_and_get_response(request)
+                except Exception as e:
+                    response = self.process_request_and_handle_exception(e)
+                try:
+                    response = self.app.process_response(response)
+                    request_finished.send(self, response=response)
+                except Exception:
+                    self.app.logger.exception(
+                        "Request finalizing failed with an error while handling an error"
+                    )
+            except Exception as e:
+                error = e
+                response = self.app.handle_exception(e)
+            except:
+                error = sys.exc_info()[1]
+                raise
+            return response(environ, start_response)
+        finally:
+            if self.app.should_ignore_error(error):
+                error = None
+            ctx.auto_pop(error)
+
+    def __dispatch_python_2_2_x(self, environ, start_response):
+        ctx = self.app.request_context(environ)
+        error: t.Optional[BaseException] = None
+        try:
+            try:
+                ctx.push()
+                if not self.app._got_first_request:
+                    with self.app._before_request_lock:
+                        if not self.app._got_first_request:
+                            for func in self.app.before_first_request_funcs:
+                                self.app.ensure_sync(func)()
+                            self.app._got_first_request = True
+                try:
+                    request_started.send(self)
+                    rv = self.app.preprocess_request()
+                    if rv is None:
+                        response = self.process_request_and_get_response(request)
+                except Exception as e:
+                    response = self.process_request_and_handle_exception(e)
+                try:
+                    response = self.app.process_response(response)
+                    request_finished.send(self, response=response)
+                except Exception:
+                    self.app.logger.exception(
+                        "Request finalizing failed with an error while handling an error"
+                    )
+            except Exception as e:
+                error = e
+                response = self.app.handle_exception(e)
+            except:
+                error = sys.exc_info()[1]
+                raise
+            return response(environ, start_response)
+        finally:
+            if "werkzeug.debug.preserve_context" in environ:
+                from flask.globals import _cv_app, _cv_request
+                environ["werkzeug.debug.preserve_context"](_cv_app.get())
+                environ["werkzeug.debug.preserve_context"](_cv_request.get())
+            if self.app.should_ignore_error(error):
+                error = None
+            ctx.pop(error)
+
+    def __dispatch_python_2_3_x(self, environ, start_response):
+        ctx = self.app.request_context(environ)
+        error: BaseException | None = None
+        try:
+            try:
+                ctx.push()
+                response = self.app.full_dispatch_request()
+                self._got_first_request = True
+                try:
+                    request_started.send(self, _async_wrapper=self.app.ensure_sync)
+                    rv = self.preprocess_request(request)
+                    if rv is None:
+                        if g.middleware_stack:
+                            try:
+                                mw = g.middleware_stack.pop()
+                                response = mw._dispatch_with_handler(request, self.process_request_and_get_response)
+                            except Exception as e:
+                                response = self.process_request_and_handle_exception(e)
+                            finally:
+                                g.middleware_stack.append(mw)
+                        else:
+                            rv = self.dispatch_request(request)
+                            response = self.app.finalize_request(rv)
+                except Exception as e:
+                    rv = self.app.handle_user_exception(e)
+                    response = self.app.finalize_request(rv)
+            except Exception as e:
+                error = e
+                response = self.app.handle_exception(e)
+            except:  # noqa: B001
+                error = sys.exc_info()[1]
+                raise
+            return response(environ, start_response)
+        finally:
+            if "werkzeug.debug.preserve_context" in environ:
+                from flask.globals import _cv_app, _cv_request
+                environ["werkzeug.debug.preserve_context"](_cv_app.get())
+                environ["werkzeug.debug.preserve_context"](_cv_request.get())
+            if error is not None and self.app.should_ignore_error(error):
+                error = None
+            ctx.pop(error)
