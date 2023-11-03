@@ -1,12 +1,15 @@
-import importlib
 import sys
 import typing as t
 from flask import Flask, g, request_started, request_finished, request
 from werkzeug.wrappers import Request, Response
 
-from .base import BaseHTTPMiddleware
+try:
+    import importlib
+    flask_version = importlib.metadata.version("flask")
+except:
+    from flask import __version__ as flask_version
 
-flask_version = importlib.metadata.version("flask")
+from .base import BaseHTTPMiddleware
 
 
 class MiddlewareManager():
@@ -163,7 +166,6 @@ class MiddlewareManager():
         try:
             try:
                 ctx.push()
-                response = self.app.full_dispatch_request()
                 self._got_first_request = True
                 try:
                     request_started.send(self, _async_wrapper=self.app.ensure_sync)
