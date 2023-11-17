@@ -80,10 +80,7 @@ class MiddlewareManager():
             and req.method == "OPTIONS"
         ):
             return self.app.make_default_options_response()
-        try:
-            return self.app.ensure_sync(self.app.view_functions[rule.endpoint])(**req.view_args)
-        except:
-            return self.app.view_functions[rule.endpoint](**req.view_args)
+        return self.app.ensure_sync(self.app.view_functions[rule.endpoint])(**req.view_args)
 
     def __dispatch_python_2_0_x(self, environ, start_response):
         ctx = self.app.request_context(environ)
