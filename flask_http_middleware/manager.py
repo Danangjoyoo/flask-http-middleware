@@ -30,15 +30,17 @@ class MiddlewareManager():
 
     def process_request_and_get_response(self, request: Request) -> Response:
         if g.middleware_stack:
+            mw = None
             try:
                 mw = g.middleware_stack.pop()
                 return mw._dispatch_with_handler(request, self.process_request_and_get_response)
             except Exception as e:
                 return self.process_request_and_handle_exception(e)
             finally:
-                g.middleware_stack.append(mw)
+                if mw is not None:
+                    g.middleware_stack.append(mw)
         rv = self.dispatch_request(request)
-        return self.app.make_response(rv)
+        return self.app.finalize_request(rv)
 
     def process_request_and_handle_exception(self, error) -> Response:
         rv = self.app.handle_user_exception(error)
