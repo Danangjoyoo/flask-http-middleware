@@ -47,7 +47,7 @@ class MiddlewareManager():
         return self.app.make_response(rv)
 
     def __call__(self, environ, start_response):
-        if flask_version.startswith("3.0"):
+        if flask_version.startswith("3."):
             return self.__dispatch_python_2_3_x(environ, start_response)
         elif flask_version.startswith("2.3"):
             return self.__dispatch_python_2_3_x(environ, start_response)
